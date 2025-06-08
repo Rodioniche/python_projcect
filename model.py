@@ -3,6 +3,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (accuracy_score, classification_report,
+                             confusion_matrix, roc_auc_score, f1_score)
 
 numeric_cols = ["age", "balance", "duration", "campaign", "pdays", "previous"]
 categorical_cols = ["job", "marital", "education", "default",
@@ -13,10 +15,12 @@ model = None
 scaler = None
 encoder = None
 is_model_trained = False
+best_threshold = 0.5
+metrics = {}
 
 
 def train_model(data_path, test_size=0.2, random_state=42):
-    global model, scaler, encoder, is_model_trained
+    global model, scaler, encoder, metrics, best_threshold, is_model_trained
 
     try:
         df = pd.read_csv(data_path, sep=";")
@@ -46,6 +50,8 @@ def train_model(data_path, test_size=0.2, random_state=42):
         )
         model.fit(X_train_processed, y_train)
 
+        _evaluate_model(X_test_processed, y_test)
+
         is_model_trained = True
         return True, "Model trained successfully!"
     except Exception as e:
@@ -58,8 +64,29 @@ def _transform_features(X):
     return np.hstack([X_num, X_cat])
 
 
+def _evaluate_model(X, y):
+    global metrics, best_threshold
+
+    y_pred = model.predict(X)
+    y_proba = model.predict_proba(X)[:, 1]
+
+    thresholds = np.linspace(0.1, 0.9, 50)
+    best_threshold = 0.5
+    best_f1 = 0
+    for threshold in thresholds:
+        y_pred_thresh = (y_proba >= threshold).astype(int)
+        f1 = f1_score(y, y_pred_thresh)
+        if f1 > best_f1:
+            best_f1 = f1
+            best_threshold = threshold
+
+    metrics = {
+        'accuracy': accuracy_score(y, y_pred),
+        'roc_auc': roc_auc_score(y, y_proba),
+        'classification_report': classification_report(y, y_pred),
+        'confusion_matrix': confusion_matrix(y, y_pred)
+    }
+
+
 def is_trained():
     return is_model_trained
-
-
-is_trained()
