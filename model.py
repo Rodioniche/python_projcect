@@ -112,3 +112,39 @@ def get_model_metrics():
     if not is_model_trained:
         return False, "Model not trained", None
     return True, "Metrics retrieved", metrics
+
+def save_model(path='model_artifacts.joblib'):
+    global model, scaler, encoder, metrics
+    
+    if model is None:
+        return False, "Model not trained"
+    
+    try:
+        artifacts = {
+            'model': model,
+            'scaler': scaler,
+            'encoder': encoder,
+            'numeric_cols': numeric_cols,
+            'categorical_cols': categorical_cols,
+            'metrics': metrics
+        }
+        joblib.dump(artifacts, path)
+        return True, f"Model saved to {path}"
+    except Exception as e:
+        return False, f"Save error: {str(e)}"
+
+def load_model(model_path):
+    global model, scaler, encoder, metrics, is_model_trained, numeric_cols, categorical_cols
+    
+    try:
+        artifacts = joblib.load(model_path)
+        model = artifacts['model']
+        scaler = artifacts['scaler']
+        encoder = artifacts['encoder']
+        numeric_cols = artifacts.get('numeric_cols', numeric_cols)
+        categorical_cols = artifacts.get('categorical_cols', categorical_cols)
+        metrics = artifacts.get('metrics', {})
+        is_model_trained = True
+        return True, "Model loaded successfully!"
+    except Exception as e:
+        return False, f"Load error: {str(e)}"
