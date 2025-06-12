@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+import joblib
+import os
+import io
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
@@ -148,3 +151,27 @@ def load_model(model_path):
         return True, "Model loaded successfully!"
     except Exception as e:
         return False, f"Load error: {str(e)}"
+def predict(input_data):
+    global model, scaler, encoder, is_model_trained
+    
+    if not is_model_trained:
+        return False, "Model is not trained. Please train or load a model first.", None
+    
+    try:
+        if isinstance(input_data, str):
+            df = pd.read_csv(input_data, sep=";")
+        else:
+            df = input_data.copy()
+        
+        missing = [col for col in required_columns if col not in df.columns]
+        if missing:
+            return False, f"Missing columns: {', '.join(missing)}", None
+        
+        processed_data = _transform_features(df[required_columns])
+        
+        probabilities = model.predict_proba(processed_data)[:, 1]
+        df['predicted_probability'] = probabilities
+        
+        return True, "Prediction successful", df
+    except Exception as e:
+        return False, f"Prediction error: {str(e)}", None
