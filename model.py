@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+import io
+import seaborn as sns
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
@@ -90,3 +93,57 @@ def _evaluate_model(X, y):
 
 def is_trained():
     return is_model_trained
+
+def generate_analysis_plot(data, feature):
+    if feature not in data.columns:
+        return None
+
+    plt.figure(figsize=(12, 8), dpi=100)
+
+    if data[feature].dtype in ['int64', 'float64']:
+        if data[feature].nunique() > 20:
+            bins = np.linspace(data[feature].min(), data[feature].max(), 11)
+            data['binned'] = pd.cut(data[feature], bins=bins)
+            sns.boxplot(
+                x='binned',
+                y='predicted_probability',
+                data=data,
+                showfliers=False
+            )
+            plt.xticks(rotation=45)
+            plt.xlabel(f"{feature} (binned)")
+        else:
+            sns.boxplot(
+                x=feature,
+                y='predicted_probability',
+                data=data,
+                showfliers=False
+            )
+            plt.xlabel(feature)
+
+        plt.title(f'Prediction Distribution by {feature}')
+        plt.ylabel('Predicted Probability')
+
+    else:
+        value_counts = data[feature].value_counts()
+        top_categories = value_counts.head(10).index
+        filtered_data = data[data[feature].isin(top_categories)]
+
+        sns.boxplot(
+            x=feature,
+            y='predicted_probability',
+            data=filtered_data,
+            showfliers=False
+        )
+        plt.title(f'Prediction Distribution by {feature}')
+        plt.ylabel('Predicted Probability')
+        plt.xlabel(feature)
+        plt.xticks(rotation=45)
+
+    plt.tight_layout()
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', dpi=120)
+    buf.seek(0)
+    plt.close()
+    return buf
