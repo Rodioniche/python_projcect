@@ -1,0 +1,6 @@
+age;job;marital;education;default;balance;housing;loan;contact;day;month;duration;campaign;pdays;previous;poutcome
+59;admin.;married;secondary;no;2343;yes;no;unknown;5;may;1042;1;-1;0;unknown
+46;self-employed;married;tertiary;no;137;yes;yes;unknown;5;may;246;1;-1;0;unknown
+51;blue-collar;married;primary;no;173;yes;no;unknown;5;may;529;2;-1;0;unknown
+56;admin.;married;secondary;no;45;no;no;unknown;5;may;1467;1;-1;0;unknown
+41;technician;married;secondary;no;1270;yes;no;unknown;5;may;1389;1;-1;0;unknown
