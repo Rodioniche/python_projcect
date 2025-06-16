@@ -22,8 +22,8 @@
 Клонируйте репозиторий:
 
     bash
-    git clone https://github.com/yourusername/bank-marketing-app.git
-    cd bank-marketing-app
+    git clone https://github.com/Rodioniche/python_projcect.git
+    cd python_projcect
 Установите зависимости:
 
     bash
