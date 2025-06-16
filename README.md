@@ -21,18 +21,18 @@
 # Установка
 Клонируйте репозиторий:
 
-    bash
+    
     git clone https://github.com/Rodioniche/python_projcect.git
     cd python_projcect
 Установите зависимости:
 
-    bash
+    
     pip install -r requirements.txt
     
 # Запуск приложения
 Выполните команду:
 
-    bash
+    
     python app.py
 
 # Особенности реализации
